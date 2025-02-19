@@ -1,18 +1,27 @@
-# tests/test_extract.py
 import pytest
-import os
 from etl.extract import extract_csv
 
-EXISTING_FILE_PATH = "/home/nicolly-silva/TesteUnitarioETL/data_source/dados_originais.csv"
+EXISTING_FILE_PATH = "../data_source/dados_originais.csv"
+NO_EXISTING_FILE_PATH = "../data_source/dados_fake.csv"
 
+class TestsExtract:
 
-def test_extract_csv():
+    def test_extract_csv_diretorio_invalido(self):
+        with pytest.raises(FileNotFoundError):
+            extract_csv(NO_EXISTING_FILE_PATH)
 
-    # Verificar se o arquivo de entrada realmente existe
-    assert os.path.exists(EXISTING_FILE_PATH), f"O arquivo {EXISTING_FILE_PATH} não foi encontrado!"
+    def test_extract_csv_sucesso(self):
+        data = extract_csv(EXISTING_FILE_PATH)
+        assert len(data) > 0
 
-    # Teste de Extração
-    data = extract_csv(EXISTING_FILE_PATH)
-    assert len(data) > 0, "Os dados extraídos estão vazios!"
-    assert isinstance(data, list), "A extração não retornou uma lista de dados."
-    assert "id" in data[0], "Os dados extraídos não contêm o campo 'id'."
+    def test_extract_csv_como_lista(self):
+        data = extract_csv(EXISTING_FILE_PATH)
+        assert isinstance(data, list)
+
+    def test_extract_csv_campos_obrigatorios(self):
+        data = extract_csv(EXISTING_FILE_PATH)
+        assert "id" in data[0]
+        assert "nome" in data[1]
+        assert "data_nascimento" in data[2]
+        assert "idade" in data[3]
+        assert "cidade" in data[4]
